@@ -1,9 +1,12 @@
 import React, { useRef } from "react";
 import { Form, Button } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { authActions } from "../store/auth";
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const history = useHistory();
   const loginIdRef = useRef(null);
   const passwordRef = useRef(null);
 
@@ -98,11 +101,11 @@ const Login = () => {
           console.log(data);
         //   dispatch(authActions.login({token:data.idToken, email:data.email}));
  console.log(data.idToken)
+ dispatch(authActions.login({token:data.idToken, email:data.email}));
 
  alert("welcome to your mail box")
 
-          // history.push("/verify-email");
-        //   history.push("/DailyExpense");
+          history.push("/inbox");
         })
         .catch((err) => {
           alert(err.message);
@@ -114,7 +117,6 @@ const Login = () => {
 
   return (
    <>
-   <h1 className="text-center">Login</h1>
     <Form onSubmit={handleSubmit} className="container mt-3">
       <h1 className="text-center">Sign In</h1>
       <Form.Group controlId="formLoginId">
