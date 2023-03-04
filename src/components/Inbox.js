@@ -18,18 +18,35 @@ const Inbox = () => {
       )
       .then((response) => {
         console.log("Todo updated successfully:", response.data);
-        // window.location.reload();
-        // setIsEditing(false);
       })
       .catch((error) => {
         console.log("Error updating todo:", error);
       });
   };
 
+
+
   const setKeyToLocalStorege = (key) => {
     localStorage.setItem("key which is clicked", key);
     setIsReadToTrue();
     setSelectedEmail(messages[key]);
+  };
+
+  
+  const deleteEmail = (key) => {
+    axios
+      .delete(
+        `https://mail-box-client-23c51-default-rtdb.firebaseio.com/${sanitizedEmail}/inbox/${key}.json`
+      )
+      .then((response) => {
+        console.log("Email deleted successfully:", response.data);
+        const updatedMessages = { ...messages };
+        delete updatedMessages[key];
+        setMessages(updatedMessages);
+      })
+      .catch((error) => {
+        console.log("Error deleting email:", error);
+      });
   };
 
   useEffect(() => {
@@ -49,7 +66,7 @@ const Inbox = () => {
       .catch((error) => {
         console.log(error);
       });
-  },);
+  },[deleteEmail,setKeyToLocalStorege]);
 
   const handleClose = () => {
     setSelectedEmail(null);
@@ -77,6 +94,9 @@ const Inbox = () => {
                 )}
                 {`${messages[key].from}: ${messages[key].subject} - ${messages[key].content} ${messages[key].read}`}
               </div>
+              <button style={{ marginLeft: "auto" }} onClick={() => deleteEmail(key)}>
+                  Delete
+                </button>
             </ListGroup.Item>
           ))}
         </ListGroup>
