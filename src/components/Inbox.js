@@ -1,12 +1,36 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Card, ListGroup } from "react-bootstrap";
+import { Card, ListGroup, Modal } from "react-bootstrap";
 
 const Inbox = () => {
   const email = localStorage.getItem("email");
   const sanitizedEmail = email.replace(/[@.]/g, "");
 
   const [messages, setMessages] = useState([]);
+  const [selectedEmail, setSelectedEmail] = useState(null);
+
+  const setIsReadToTrue = () => {
+    const key = localStorage.getItem("key which is clicked");
+    axios
+      .patch(
+        `https://mail-box-client-23c51-default-rtdb.firebaseio.com/${sanitizedEmail}/inbox/${key}.json`,
+        { read: true }
+      )
+      .then((response) => {
+        console.log("Todo updated successfully:", response.data);
+        // window.location.reload();
+        // setIsEditing(false);
+      })
+      .catch((error) => {
+        console.log("Error updating todo:", error);
+      });
+  };
+
+  const setKeyToLocalStorege = (key) => {
+    localStorage.setItem("key which is clicked", key);
+    setIsReadToTrue();
+    setSelectedEmail(messages[key]);
+  };
 
   useEffect(() => {
     axios
@@ -17,27 +41,65 @@ const Inbox = () => {
         console.log(
           `logging from local inbox ${JSON.stringify(response.data)}`
         );
-        setMessages(Object.values(response.data));
+
+        if (response.data) {
+          setMessages(response.data);
+        }
       })
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  },);
+
+  const handleClose = () => {
+    setSelectedEmail(null);
+  };
 
   return (
     <div>
       <h3>Inbox</h3>
       <Card className="text-left">
         <ListGroup variant="flush">
-          {messages.map((message,index) => (
-            <ListGroup.Item key={index}>
-            <div>
-              {`${message.from}: ${message.subject} - ${message.content}`}
-            </div>
-          </ListGroup.Item>
+          {Object.keys(messages).reverse().map((key, index) => (
+            <ListGroup.Item key={key}>
+              <div onClick={() => setKeyToLocalStorege(key)}>
+                {!messages[key].read && (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      backgroundColor: "blue",
+                      marginRight: "5px",
+                    }}
+                  ></span>
+                )}
+                {`${messages[key].from}: ${messages[key].subject} - ${messages[key].content} ${messages[key].read}`}
+              </div>
+            </ListGroup.Item>
           ))}
         </ListGroup>
       </Card>
+      <Modal show={selectedEmail !== null} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Email Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            <strong>From: </strong>
+            {selectedEmail && selectedEmail.from}
+          </p>
+          <p>
+            <strong>Subject: </strong>
+            {selectedEmail && selectedEmail.subject}
+          </p>
+          <p>
+            <strong>Content: </strong>
+            {selectedEmail && selectedEmail.content}
+          </p>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

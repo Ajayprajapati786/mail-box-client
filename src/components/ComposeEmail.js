@@ -55,6 +55,7 @@ const ComposeEmail = () => {
         from: toRef.current.value,
         subject: subjectRef.current.value,
         content: editorState.getCurrentContent().getPlainText(),
+        read:false
       }
     )
     .then((response) => {
