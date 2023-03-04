@@ -113,6 +113,8 @@ const Login = () => {
   };
 
   return (
+   <>
+   <h1 className="text-center">Login</h1>
     <Form onSubmit={handleSubmit} className="container mt-3">
       <h1 className="text-center">Sign In</h1>
       <Form.Group controlId="formLoginId">
@@ -140,6 +142,7 @@ const Login = () => {
         <p className="text-muted">Forgot password?? <span onClick={ForgotPasswordHandler} style={{textDecoration:"underline",cursor:"pointer"}}>Click Here</span></p>
       </div>
     </Form>
+   </>
   );
 };
 
