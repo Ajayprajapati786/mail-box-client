@@ -3,11 +3,18 @@ import { EditorState } from 'draft-js';
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { Form, Button } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const ComposeEmail = () => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const toRef = useRef();
   const subjectRef = useRef();
+
+  const senderEmail = useSelector((state) => state.auth.userEmail);
+  const sanitizedSenderEmail = senderEmail.replace(/[@.]/g, "");
+  
+
 
   const onEditorStateChange = (newEditorState) => {
     setEditorState(newEditorState);
@@ -16,9 +23,47 @@ const ComposeEmail = () => {
   const onSubmit = (event) => {
     event.preventDefault();
     // Submit the form data here
-    console.log('To:', toRef.current.value);
-    console.log('Subject:', subjectRef.current.value);
-    console.log('Content:', editorState.getCurrentContent().getPlainText());
+    console.log(toRef.current.value);
+    const receiverEmail = toRef.current.value;
+    const sanitizedReceiverEmail = receiverEmail.replace(/[@.]/g, "");
+    const message = {
+        to: toRef.current.value,
+        subject: subjectRef.current.value,
+        content: editorState.getCurrentContent().getPlainText(),
+      };
+// sending data to the outbox
+      axios
+      .post(
+        `https://mail-box-client-23c51-default-rtdb.firebaseio.com/${sanitizedSenderEmail}/outbox.json`,
+        message
+      )
+      .then((response) => {
+        console.log(response);
+        toRef.current.value="";
+        subjectRef.current.value="";
+        setEditorState("");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+
+    //Sending data to inbox of the user
+    axios
+    .post(
+      `https://mail-box-client-23c51-default-rtdb.firebaseio.com/${sanitizedReceiverEmail}/inbox.json`,
+      message
+    )
+    .then((response) => {
+      console.log(response);
+      toRef.current.value="";
+      subjectRef.current.value="";
+      setEditorState("");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
   };
 
   return (
@@ -34,18 +79,17 @@ const ComposeEmail = () => {
       </Form.Group>
       <Form.Group controlId="content">
         <Form.Label style={{ textAlign: 'left' }}>Content:</Form.Label>
-        <div style={{border:'solid black 1px',  boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.3)' }}>
+        <div style={{ boxShadow: '5px 5px 10px rgba(0, 0, 0, 0.3)' }}>
         <Editor
           editorState={editorState}
           toolbarClassName="toolbarClassName"
           wrapperClassName="wrapperClassName"
           editorClassName="editorClassName"
           onEditorStateChange={onEditorStateChange}
-          
         />
         </div>
       </Form.Group>
-      <Button variant="primary" type="submit">Send</Button>
+      <Button variant="primary" type="submit" className='mt-3'>Send</Button>
     </Form>
   );
 }
