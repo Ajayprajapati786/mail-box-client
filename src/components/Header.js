@@ -23,9 +23,12 @@ const Header = () => {
         <Nav className="mr-auto">
           {!isAuthenticated && <Link to="/login" className="nav-link">Login</Link>}
           {!isAuthenticated && <Link to="/signup" className="nav-link">Signup</Link>}
-          {isAuthenticated && <Link to="/login" className="nav-link" onClick={logout}>Logout</Link>}
           {isAuthenticated && <Link to="/composeEmail" className="nav-link">Compose</Link>}
           {isAuthenticated && <Link to="/inbox" className="nav-link">Inbox</Link>}
+          {isAuthenticated && <Link to="/sent" className="nav-link">Sent mail</Link>}
+          {isAuthenticated && <Link to="/login" className="nav-link" onClick={logout}>Logout</Link>}
+          
+
         </Nav>
       </Navbar.Collapse>
     </Navbar>

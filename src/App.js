@@ -9,6 +9,7 @@ import Header from './components/Header';
 import { useSelector } from 'react-redux';
 // import Inbox from './components/inbox';
 import Inbox from './components/Inbox';
+import Sent from './components/Sent';
 
 
 function App() {
@@ -33,6 +34,12 @@ function App() {
 
         <Route path="/inbox">
           {isAuthenticated && <Inbox/>}
+          {!isAuthenticated && <Redirect to="/login" />}
+        </Route>
+
+
+        <Route path="/sent">
+          {isAuthenticated && <Sent/>}
           {!isAuthenticated && <Redirect to="/login" />}
         </Route>
 
