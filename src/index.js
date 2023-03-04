@@ -8,6 +8,7 @@ import "../node_modules/bootstrap/dist/css/bootstrap.css";
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
+// import 'react-bootstrap-sidebar/dist/index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

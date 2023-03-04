@@ -51,8 +51,11 @@ const ComposeEmail = () => {
     //Sending data to inbox of the user
     axios
     .post(
-      `https://mail-box-client-23c51-default-rtdb.firebaseio.com/${sanitizedReceiverEmail}/inbox.json`,
-      message
+      `https://mail-box-client-23c51-default-rtdb.firebaseio.com/${sanitizedReceiverEmail}/inbox.json`,{
+        from: toRef.current.value,
+        subject: subjectRef.current.value,
+        content: editorState.getCurrentContent().getPlainText(),
+      }
     )
     .then((response) => {
       console.log(response);
